@@ -3,11 +3,14 @@ package com.school.sba.serviceimpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.school.sba.entity.User;
 import com.school.sba.enums.UserRole;
+import com.school.sba.exceptions.AdminOnlyException;
 import com.school.sba.exceptions.ContraintsValidationException;
+import com.school.sba.exceptions.DuplicateEntryException;
 import com.school.sba.exceptions.ExistingAdminException;
 import com.school.sba.exceptions.UserNotFoundByIdException;
 import com.school.sba.repository.UserRepository;
@@ -21,13 +24,19 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private ResponseStructure<UserResponse> structure;
 
+	static boolean admin = false;
+
 	@Autowired
 	private UserRepository userRepo;
-	
+
+	@Autowired
+	private PasswordEncoder encoder;
+
 	private User mapToUser(UserRequest request) {
 
 		return User.builder().email(request.getEmail()).contactNo(request.getContactNo())
-				.firstName(request.getFirstName()).lastName(request.getLastName()).password(request.getPassword())
+				.firstName(request.getFirstName()).lastName(request.getLastName())
+				.password(encoder.encode(request.getPassword()))
 				.userName(request.getUserName()).userRole(request.getUserRole()).isDelete(false).build();
 	}
 
@@ -44,29 +53,6 @@ public class UserServiceImpl implements UserService {
 		return new ResponseEntity<ResponseStructure<UserResponse>>(structure, HttpStatus.OK);
 	}
 
-	@Override
-	public ResponseEntity<ResponseStructure<UserResponse>> regesterUser(UserRequest user) {
-		try {
-			if (user.getUserRole() == UserRole.ADMIN) {
-				if (userRepo.existsByUserRole(user.getUserRole()) != true) {
-					User userEntity = userRepo.save(mapToUser(user));
-
-					return new ResponseEntity<ResponseStructure<UserResponse>>(
-							new ResponseStructure<UserResponse>(HttpStatus.OK.value(), "user added successfully ",
-									mapToUserResponse(userEntity)),
-							HttpStatus.OK);
-				} else {
-					throw new ExistingAdminException("ADMIN alredy existed ");
-				}
-			}
-		} catch (Exception e) {
-			throw new ContraintsValidationException("no duplicate values");
-		}
-		User userEntity = userRepo.save(mapToUser(user));
-		return new ResponseEntity<ResponseStructure<UserResponse>>(new ResponseStructure<UserResponse>(
-				HttpStatus.OK.value(), "user added successfully ", mapToUserResponse(userEntity)), HttpStatus.CREATED);
-
-	}
 
 	@Override
 	public ResponseEntity<ResponseStructure<UserResponse>> findUserById(int userId) {
@@ -92,4 +78,43 @@ public class UserServiceImpl implements UserService {
 		return new ResponseEntity<ResponseStructure<UserResponse>>(structure, HttpStatus.OK);
 	}
 
+	@Override
+	public ResponseEntity<ResponseStructure<UserResponse>> registerUser(UserRequest user) {
+		User user1 = userRepo.save(mapToUser(user));
+		structure.setData(mapToUserResponse(user1));
+		structure.setMessage("User Saved Successfully");
+		structure.setStatus(HttpStatus.CREATED.value());
+		return new ResponseEntity<ResponseStructure<UserResponse>>(structure,HttpStatus.CREATED);
+	}
+
+	@Override
+	public ResponseEntity<ResponseStructure<UserResponse>> addAdmin(UserRequest request) {
+		if(request.getUserRole()==UserRole.ADMIN)
+		{
+			if(userRepo.existsByUserRole(request.getUserRole())==false)
+			{
+				System.out.println("hi");
+				User user1 = userRepo.save(mapToUser(request));
+				structure.setData(mapToUserResponse(user1));
+				structure.setMessage("Admin Created Successfully");
+				structure.setStatus(HttpStatus.CREATED.value());
+				return new ResponseEntity<ResponseStructure<UserResponse>>(structure,HttpStatus.CREATED);
+			}
+			else
+			{
+				throw new ExistingAdminException("Admin can be only one Person");
+			}
+		}
+		else {
+			throw new AdminOnlyException("Only Admin Should Be Add");	
+		}
+
+	}
+
+
+
+
+
 }
+
+

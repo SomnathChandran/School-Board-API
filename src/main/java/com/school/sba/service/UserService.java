@@ -9,10 +9,12 @@ import com.school.sba.util.ResponseStructure;
 
 public interface UserService {
 
-	ResponseEntity<ResponseStructure<UserResponse>> regesterUser(UserRequest user);
+	ResponseEntity<ResponseStructure<UserResponse>> registerUser( UserRequest user);
 
 	ResponseEntity<ResponseStructure<UserResponse>> findUserById(int userId);
 
 	ResponseEntity<ResponseStructure<UserResponse>> deleteByUserId(int userId);
+
+	ResponseEntity<ResponseStructure<UserResponse>> addAdmin(UserRequest userRequest);
 
 }

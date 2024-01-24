@@ -6,6 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.school.sba.exceptions.AcademicProgramNotFoundByIdException;
+import com.school.sba.exceptions.AdminOnlyException;
 import com.school.sba.exceptions.ContraintsValidationException;
 import com.school.sba.exceptions.DuplicateEntryException;
 import com.school.sba.exceptions.ExistingAdminException;
@@ -45,15 +48,23 @@ public class ApplicationExceptionHandler {
 		return structre(HttpStatus.BAD_REQUEST, ex.getMessage(),"Invalid Request!!");
 	}
 	@ExceptionHandler(SchoolNotFoundException.class)
-	public ResponseEntity<Object> illegalRequestException(SchoolNotFoundException ex){
+	public ResponseEntity<Object> schoolNotFoundException(SchoolNotFoundException ex){
 		return structre(HttpStatus.BAD_REQUEST, ex.getMessage(),"Invalid Request!!");
 	}
 	@ExceptionHandler(DuplicateEntryException.class)
-	public ResponseEntity<Object> illegalRequestException(DuplicateEntryException ex){
+	public ResponseEntity<Object> duplicateEntryException(DuplicateEntryException ex){
 		return structre(HttpStatus.BAD_REQUEST, ex.getMessage(),"Invalid Request!!");
 	}
 	@ExceptionHandler(ScheduleNotFoundException.class)
-	public ResponseEntity<Object> illegalRequestException(ScheduleNotFoundException ex){
+	public ResponseEntity<Object> scheduleNotFoundException(ScheduleNotFoundException ex){
+		return structre(HttpStatus.BAD_REQUEST, ex.getMessage(),"Invalid Request!!");
+	}
+	@ExceptionHandler(AcademicProgramNotFoundByIdException.class)
+	public ResponseEntity<Object> academicProgramNotFoundByIdException(AcademicProgramNotFoundByIdException ex){
+		return structre(HttpStatus.BAD_REQUEST, ex.getMessage(),"Invalid Request!!");
+	}
+	@ExceptionHandler(AdminOnlyException.class)
+	public ResponseEntity<Object> adminOnlyException(AdminOnlyException ex){
 		return structre(HttpStatus.BAD_REQUEST, ex.getMessage(),"Invalid Request!!");
 	}
 }

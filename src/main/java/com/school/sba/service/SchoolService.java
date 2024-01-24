@@ -8,5 +8,5 @@ import com.school.sba.util.ResponseStructure;
 
 public interface SchoolService {
 	
-	public ResponseEntity<ResponseStructure<SchoolResponse>> saveSchool(int userId, SchoolRequest schoolRequest);
+	public ResponseEntity<ResponseStructure<SchoolResponse>> saveSchool( SchoolRequest schoolRequest);
 }
