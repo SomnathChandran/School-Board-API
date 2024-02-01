@@ -9,12 +9,15 @@ import org.springframework.stereotype.Service;
 
 import com.school.sba.entity.School;
 import com.school.sba.enums.UserRole;
+import com.school.sba.exceptions.AcademicProgramNotFoundByIdException;
 import com.school.sba.exceptions.ExistingAdminException;
 import com.school.sba.exceptions.IllegalRequestException;
+import com.school.sba.exceptions.SchoolNotFoundException;
 import com.school.sba.exceptions.UserNotFoundByIdException;
 import com.school.sba.repository.SchoolRepository;
 import com.school.sba.repository.UserRepository;
 import com.school.sba.requestdto.SchoolRequest;
+import com.school.sba.responsedto.AcademicProgramsResponse;
 import com.school.sba.responsedto.SchoolResponse;
 import com.school.sba.service.SchoolService;
 import com.school.sba.util.ResponseStructure;
@@ -70,7 +73,20 @@ public class SchoolServiceImpl implements SchoolService {
 			
 		}).orElseThrow(()-> new UserNotFoundByIdException("Falied to find User!!"));
 	}
-
+	
+	public ResponseEntity<ResponseStructure<SchoolResponse>> deleteSchool(int schoolId) {
+		return schoolRepo.findById(schoolId).map(school ->{
+			if(school.isDelete()== false) {
+				school.setDelete(true);
+				schoolRepo.save(school);
+				structure.setStatus(HttpStatus.OK.value());
+				structure.setMessage("The School Successfully Is Deleted !!");
+				structure.setData(mapToSchoolResponse(school));
+			}
+			return new ResponseEntity<ResponseStructure<SchoolResponse>>(structure,HttpStatus.OK);
+		}).orElseThrow(()-> new SchoolNotFoundException("The Expected School Is Not Found By Given Id!!"));
+		
+	}
 	
 
 

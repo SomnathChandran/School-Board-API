@@ -1,6 +1,8 @@
 package com.school.sba.serviceimpl;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -100,6 +102,21 @@ public class ScheduleServiceImpl implements ScheduleService {
 		structure.setMessage("Schedule Updated Successfully!!");
 		structure.setData(mapToScheduleResponse(schedule1));
 		return new ResponseEntity<ResponseStructure<ScheduleResponse>>(structure,HttpStatus.OK);
+	}
+	
+	@Override
+	public ResponseEntity<ResponseStructure<List<ScheduleResponse>>>deleteSchedule(List<Schedule> schedule){
+		List<ScheduleResponse>sList = new ArrayList<>();
+		schedule.forEach(schedule1 ->{
+			scheduleRepo.delete(schedule1);
+			sList.add(mapToScheduleResponse(schedule1));
+		});
+		ResponseStructure<List<ScheduleResponse>>structureList = new ResponseStructure<>();
+		structureList.setMessage("The Scheule SuccessFully Gets Deleted!!");
+		structureList.setStatus(HttpStatus.OK.value());
+		structureList.setData(sList);
+		
+		return new ResponseEntity<ResponseStructure<List<ScheduleResponse>>>(structureList,HttpStatus.OK);
 	}
 
 }

@@ -1,6 +1,6 @@
 package com.school.sba.enums;
 
 public enum ProgramType {
-	BE,ME
+	CSE,MECH,BE
 
 }

@@ -1,19 +1,15 @@
-package com.school.sba.requestdto;
-
-import java.util.List;
+package com.school.sba.exceptions;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Builder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubjectRequest {
-	private List<String> subjects;
-
+public class ClassRoomNotFreeException extends RuntimeException {
+	private String message;
+	
 }

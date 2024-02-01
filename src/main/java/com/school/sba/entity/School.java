@@ -26,11 +26,12 @@ public class School {
 	private long schoolcontactNo;
 	private String schoolMail;
 	private String schoolAddress;
+	private boolean isDelete;
 	
 	@OneToOne
 	private Schedule schedule;
 	
-	@OneToMany
-	private List<AcademicPrograms>acagemicPrograms= new ArrayList<AcademicPrograms>();
+	@OneToMany(mappedBy = "school")
+	private List<AcademicPrograms> academicPrograms = new ArrayList<AcademicPrograms>();
 	
 }
