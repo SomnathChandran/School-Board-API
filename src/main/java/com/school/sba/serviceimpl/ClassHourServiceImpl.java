@@ -252,18 +252,5 @@ public class ClassHourServiceImpl implements ClassHourService {
 
 	}
 
-
-
-
-
-	//	@Override
-	//	public void autoGenerateClassHour() {
-	//	List<ClassHour> allAcademicProgram = classHourRepo.findAllByAcademicProgram();
-	//	allAcademicProgram.forEach(program ->{
-	//		int programId = program.getAcademicProgram().getProgramId();
-	//		generateClassHourForAcademicProgram(programId);
-	//	});
-	//				
-	//	}
 }
 
