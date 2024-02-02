@@ -219,16 +219,51 @@ public class ClassHourServiceImpl implements ClassHourService {
 				.build();
 	}
 
+	public ClassHour mapToClassHour(ClassHour classHour) {
+		return ClassHour.builder().academicProgram(classHour.getAcademicProgram())
+				.beginsAt(classHour.getBeginsAt().plusWeeks(1)).classStatus(classHour.getClassStatus())
+				.endsAt(classHour.getEndsAt().plusWeeks(1)).roomNo(classHour.getRoomNo())
+				.subject(classHour.getSubject()).user(classHour.getUser()).build();
+	}
+
 
 
 	@Override
-	public void autoGenerateClassHour() {
-	List<ClassHour> allAcademicProgram = classHourRepo.findAllByAcademicProgram();
-	allAcademicProgram.forEach(program ->{
-		int programId = program.getAcademicProgram().getProgramId();
-		generateClassHourForAcademicProgram(programId);
-	});
-				
+	public ResponseEntity<ResponseStructure<List<ClassHourResponse>>> generateClassHourForNextWeek(int programId) {
+		academicRepo.findById(programId).map(program -> {
+			LocalDateTime endsALocalTime = program.getHours().getLast().getEndsAt();
+			LocalDateTime minusDays = endsALocalTime.minusDays(5).minusHours(8).minusMinutes(30);
+			LocalDateTime minusDays2 = endsALocalTime;
+			System.out.println(minusDays + " " + minusDays2);
+
+			List<ClassHour> findByEndsALocalTimeBetween = classHourRepo.findByEndsALocalTimeBetween(minusDays,minusDays2);
+			List<ClassHourResponse> clist = new ArrayList<>();
+
+			findByEndsALocalTimeBetween.forEach(find -> {
+				clist.add(mapToClassHourResponse(classHourRepo.save(mapToClassHour(find))));
+			});
+			structure.setData(clist);
+			structure.setMessage("Created Next Week Class Hour !!!");
+			structure.setStatus(HttpStatus.CREATED.value());
+			return new ResponseEntity<ResponseStructure<List<ClassHourResponse>>>(structure,HttpStatus.CREATED);
+
+		});
+		return new ResponseEntity<ResponseStructure<List<ClassHourResponse>>>(structure, HttpStatus.CREATED);
+
 	}
+
+
+
+
+
+	//	@Override
+	//	public void autoGenerateClassHour() {
+	//	List<ClassHour> allAcademicProgram = classHourRepo.findAllByAcademicProgram();
+	//	allAcademicProgram.forEach(program ->{
+	//		int programId = program.getAcademicProgram().getProgramId();
+	//		generateClassHourForAcademicProgram(programId);
+	//	});
+	//				
+	//	}
 }
 

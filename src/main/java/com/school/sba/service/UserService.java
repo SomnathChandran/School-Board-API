@@ -23,6 +23,8 @@ public interface UserService {
 	ResponseEntity<ResponseStructure<UserResponse>> addSubjectToTeacher(int subjectId, int userId);
 	
 	ResponseEntity<ResponseStructure<List<UserResponse>>> findUserDetailsByRole(UserRole role, int programId);
+	
+	void permanentDeleteUser();
 
 
 }

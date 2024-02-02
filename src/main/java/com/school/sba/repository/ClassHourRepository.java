@@ -17,6 +17,8 @@ public interface ClassHourRepository extends JpaRepository<ClassHour, Integer> {
 
 	List<ClassHour> findByAcademicProgram(AcademicPrograms programId);
 
-	List<ClassHour> findAllByAcademicProgram();
+	List<ClassHour> findByEndsALocalTimeBetween(LocalDateTime minusDays, LocalDateTime minusDays2);
+
+//	List<ClassHour> findAllByAcademicProgram();
 
 }

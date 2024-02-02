@@ -155,9 +155,8 @@ public class AcademicProgramsServiceImpl implements AcademicProgramService{
 	@Override
 	public void permanentDeleteAcademicProgram() {
 		List<AcademicPrograms> programs = academicRepo.findByIsDelete(true);
-		programs.forEach(program ->{
-			classHourRepo.deleteAll(program.getHours());
-			academicRepo.delete(program);
+		programs.forEach(program ->{ classHourRepo.deleteAll(program.getHours());
+		academicRepo.delete(program);
 		});
 	}
 }

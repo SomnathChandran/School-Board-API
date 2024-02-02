@@ -11,4 +11,6 @@ public interface SchoolService {
 	public ResponseEntity<ResponseStructure<SchoolResponse>> saveSchool( SchoolRequest schoolRequest);
 
 	public ResponseEntity<ResponseStructure<SchoolResponse>> deleteSchool(int schoolId);
+	
+	void permanentDeleteSchool();
 }

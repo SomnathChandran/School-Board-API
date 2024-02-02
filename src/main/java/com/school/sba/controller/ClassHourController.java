@@ -31,8 +31,10 @@ public class ClassHourController {
 	public ResponseEntity<ResponseStructure<List<ClassHourResponse>>> updateClassHour(@RequestBody ArrayList<ClassHourRequest>classHours){
 		return classHourService.updateClassHour(classHours);
 	}
-	public void autoGenerateClassHour() {
-		 classHourService.autoGenerateClassHour();
+	@PostMapping("/academic-program/{programId}")
+	public ResponseEntity<ResponseStructure<List<ClassHourResponse>>> generateClassHourForNextWeek(int programId){
+		return classHourService.generateClassHourForNextWeek(programId);
+		
 	}
 
 }

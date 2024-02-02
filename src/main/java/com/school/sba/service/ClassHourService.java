@@ -19,7 +19,7 @@ public interface ClassHourService  {
 
 	ResponseEntity<ResponseStructure<List<ClassHourResponse>>> deleteClassHour(List<ClassHour> classHour);
 
-	void autoGenerateClassHour();
+	ResponseEntity<ResponseStructure<List<ClassHourResponse>>> generateClassHourForNextWeek(int programId);
 	
 
 

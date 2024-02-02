@@ -3,21 +3,19 @@ package com.school.sba.serviceimpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.school.sba.entity.School;
 import com.school.sba.enums.UserRole;
-import com.school.sba.exceptions.AcademicProgramNotFoundByIdException;
 import com.school.sba.exceptions.ExistingAdminException;
 import com.school.sba.exceptions.IllegalRequestException;
 import com.school.sba.exceptions.SchoolNotFoundException;
 import com.school.sba.exceptions.UserNotFoundByIdException;
+import com.school.sba.repository.AcademicProgramsRepository;
 import com.school.sba.repository.SchoolRepository;
 import com.school.sba.repository.UserRepository;
 import com.school.sba.requestdto.SchoolRequest;
-import com.school.sba.responsedto.AcademicProgramsResponse;
 import com.school.sba.responsedto.SchoolResponse;
 import com.school.sba.service.SchoolService;
 import com.school.sba.util.ResponseStructure;
@@ -29,6 +27,9 @@ public class SchoolServiceImpl implements SchoolService {
 
 	@Autowired
 	private UserRepository userRepo;
+	
+	@Autowired
+	private AcademicProgramsRepository academicRepo;
 
 	@Autowired
 	private ResponseStructure<SchoolResponse> structure;
@@ -86,6 +87,21 @@ public class SchoolServiceImpl implements SchoolService {
 			return new ResponseEntity<ResponseStructure<SchoolResponse>>(structure,HttpStatus.OK);
 		}).orElseThrow(()-> new SchoolNotFoundException("The Expected School Is Not Found By Given Id!!"));
 		
+	}
+
+	@Override
+	public void permanentDeleteSchool() {
+		schoolRepo.findAllByIsDelete(true).forEach(school ->{
+			school.getAcademicPrograms().forEach(program ->{
+				program.setSchool(null);
+				academicRepo.save(program);
+			});
+			userRepo.findBySchool(school).forEach(user ->{
+				user.setSchool(null);
+				userRepo.save(user);
+			});
+			schoolRepo.delete(school);
+		});
 	}
 	
 

@@ -25,6 +25,7 @@ import com.school.sba.exceptions.SubjectsOnlyAddedToTeacherException;
 import com.school.sba.exceptions.UserIsNotAnAdminException;
 import com.school.sba.exceptions.UserNotFoundByIdException;
 import com.school.sba.repository.AcademicProgramsRepository;
+import com.school.sba.repository.ClassHourRepository;
 import com.school.sba.repository.SubjectRepository;
 import com.school.sba.repository.UserRepository;
 import com.school.sba.requestdto.UserRequest;
@@ -38,6 +39,8 @@ public class UserServiceImpl implements UserService {
 	private ResponseStructure<UserResponse> structure;
 	@Autowired
 	private ResponseStructure<List<UserResponse>> structureList;
+	@Autowired
+	private ClassHourRepository classHourRepo;
 
 	static boolean admin = false;
 
@@ -106,12 +109,13 @@ public class UserServiceImpl implements UserService {
 				if(userRequest.getUserRole()!= UserRole.ADMIN) {
 					User user1 = userRepo.save(mapToUser(userRequest));
 					user1.setSchool(user.getSchool());
+					userRepo.save(user1);
 					structure.setData(mapToUserResponse(user1));
 					structure.setMessage("User Saved Successfully");
 					structure.setStatus(HttpStatus.CREATED.value());
 				}
 				else{
-					throw new ExistingAdminException("ADMIn Already Presented!!");
+					throw new ExistingAdminException("Admin Already Presented!!");
 				}
 			}else{
 				throw new SchoolNotFoundException("School Not Found For The Respected User!!");
@@ -192,6 +196,25 @@ public class UserServiceImpl implements UserService {
 				throw new IllegalRequestException("Program Should Have List Of Users!!");
 			}
 		}).orElseThrow(()-> new AcademicProgramNotFoundByIdException("Ivalid Academic Program ID!!"));
+		
+	}
+
+	@Override
+	public void permanentDeleteUser() {
+		userRepo.findAllByIsDelete(true).forEach(user ->{
+			 List<User>uList = new ArrayList<>();
+			 user.getPrograms().forEach(program ->{
+				 uList.add(null);
+				 program.setUsers(uList);
+				 academicRepo.save(program);
+			 });
+			 classHourRepo.findByUser(user).forEach(classHour ->{
+				 classHour.setUser(null);
+				 classHourRepo.save(classHour);
+			 });
+			 System.out.println("User Gets Deleted Successfully!!");
+			 userRepo.delete(user);
+		 });
 		
 	}
 
