@@ -13,6 +13,7 @@ import com.school.sba.exceptions.AdminCannotBeAssignedToAcademicException;
 import com.school.sba.exceptions.AdminOnlyException;
 import com.school.sba.exceptions.ClassRoomNotFreeException;
 import com.school.sba.exceptions.ContraintsValidationException;
+import com.school.sba.exceptions.DuplicateClassHoursException;
 import com.school.sba.exceptions.DuplicateEntryException;
 import com.school.sba.exceptions.ExistingAdminException;
 import com.school.sba.exceptions.IllegalRequestException;
@@ -21,6 +22,7 @@ import com.school.sba.exceptions.InvalidUserRoleException;
 import com.school.sba.exceptions.IrreleventTeacherException;
 import com.school.sba.exceptions.ScheduleNotFoundBySchoolIdException;
 import com.school.sba.exceptions.ScheduleNotFoundException;
+import com.school.sba.exceptions.SchoolNotAddedToAcademicProgramException;
 import com.school.sba.exceptions.SchoolNotFoundException;
 import com.school.sba.exceptions.SubjectNotPresentException;
 import com.school.sba.exceptions.SubjectsOnlyAddedToTeacherException;
@@ -115,6 +117,14 @@ public class ApplicationExceptionHandler {
 	}
 	@ExceptionHandler(ClassRoomNotFreeException.class)
 	public ResponseEntity<Object> classRoomNotFreeException(ClassRoomNotFreeException ex){
+		return structre(HttpStatus.BAD_REQUEST, ex.getMessage(),"invalid Request..");
+	}
+	@ExceptionHandler(SchoolNotAddedToAcademicProgramException.class)
+	public ResponseEntity<Object> schoolNotAddedToAcademicProgramException(SchoolNotAddedToAcademicProgramException ex){
+		return structre(HttpStatus.BAD_REQUEST, ex.getMessage(),"invalid Request..");
+	}
+	@ExceptionHandler(DuplicateClassHoursException.class)
+	public ResponseEntity<Object> duplicateClassHoursException(DuplicateClassHoursException ex){
 		return structre(HttpStatus.BAD_REQUEST, ex.getMessage(),"invalid Request..");
 	}
 }

@@ -47,7 +47,7 @@ public class AcademicPrograms {
 	@ManyToMany(fetch = FetchType.EAGER)
 	private List<User> users;
 	
-	@OneToMany(mappedBy = "academicProgram")
+	@OneToMany(mappedBy = "academicProgram",fetch = FetchType.EAGER)
 	private List<ClassHour> hours;
 
 }

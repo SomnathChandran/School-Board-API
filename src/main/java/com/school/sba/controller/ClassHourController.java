@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.school.sba.requestdto.ClassHourRequest;
+import com.school.sba.requestdto.ExcelRequestDto;
 import com.school.sba.responsedto.ClassHourResponse;
 import com.school.sba.service.ClassHourService;
 import com.school.sba.util.ResponseStructure;
@@ -23,7 +24,7 @@ public class ClassHourController {
 	private ClassHourService classHourService;
 
 	@PostMapping("/academic-program/{programId}/class-hours")
-	public ResponseEntity<ResponseStructure<String>>generateClassHourForAcademicProgram(@PathVariable int programId){
+	public ResponseEntity<ResponseStructure<List<ClassHourResponse>>> generateClassHourForAcademicProgram(@PathVariable int programId){
 		return classHourService.generateClassHourForAcademicProgram(programId);
 	}
 
@@ -35,6 +36,11 @@ public class ClassHourController {
 	public ResponseEntity<ResponseStructure<List<ClassHourResponse>>> generateClassHourForNextWeek(int programId){
 		return classHourService.generateClassHourForNextWeek(programId);
 		
+	}
+	
+	@PostMapping("/academic-programs/{programId}/class-hours/write-excel")
+	public ResponseEntity<ResponseStructure<String>>generateClassHourInExcel(@PathVariable int programId,@RequestBody ExcelRequestDto excelRequestDto){
+		return classHourService.generateClassHourInExcel(programId,excelRequestDto);
 	}
 
 }

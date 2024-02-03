@@ -1,6 +1,7 @@
 package com.school.sba.serviceimpl;
 
 import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,6 +66,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 	public ResponseEntity<ResponseStructure<ScheduleResponse>> createSchedule(int schoolId,ScheduleRequest scheduleRequest) {
 		School school = schoolRepo.findById(schoolId).orElseThrow(()-> new SchoolNotFoundException("School is Not Present"));
 		if(school.getSchedule() == null) {
+			
 			Schedule schedule = scheduleRepo.save(mapToSchedule(scheduleRequest));
 			school.setSchedule(schedule);
 			school= schoolRepo.save(school);
@@ -117,6 +119,27 @@ public class ScheduleServiceImpl implements ScheduleService {
 		structureList.setData(sList);
 		
 		return new ResponseEntity<ResponseStructure<List<ScheduleResponse>>>(structureList,HttpStatus.OK);
+	}
+	
+	private boolean validateSchedule(ScheduleRequest scheduleRequest) {
+		
+		int breakLengthMins = scheduleRequest.getBreakLengthMins();
+		LocalTime opensAt = scheduleRequest.getOpensAt();
+		LocalTime closesAt = scheduleRequest.getClosesAt();
+		LocalTime breakTime = scheduleRequest.getBreakTime();
+		int classHoursPerDay = scheduleRequest.getClassHoursPerDay();
+		int classHourLengthMins = scheduleRequest.getClassHourLengthMins();
+		int lunchLengthMins = scheduleRequest.getLunchLengthMins();
+		LocalTime lunchTime = scheduleRequest.getLunchTime();
+		
+		
+		
+		
+		
+		
+		
+		
+		return true ;
 	}
 
 }
