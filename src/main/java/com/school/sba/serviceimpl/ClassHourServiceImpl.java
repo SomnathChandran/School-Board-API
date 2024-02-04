@@ -1,21 +1,28 @@
 package com.school.sba.serviceimpl;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.auditing.CurrentDateTimeProvider;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.school.sba.entity.AcademicPrograms;
 import com.school.sba.entity.ClassHour;
 import com.school.sba.entity.Schedule;
 import com.school.sba.entity.School;
@@ -37,7 +44,6 @@ import com.school.sba.requestdto.ClassHourRequest;
 import com.school.sba.requestdto.ExcelRequestDto;
 import com.school.sba.responsedto.ClassHourResponse;
 import com.school.sba.service.ClassHourService;
-import com.school.sba.util.ResponseEntityProxy;
 import com.school.sba.util.ResponseStructure;
 @Service
 public class ClassHourServiceImpl implements ClassHourService {
@@ -354,6 +360,76 @@ public class ClassHourServiceImpl implements ClassHourService {
 	 responseStructure.setData("success");
 	 return new ResponseEntity<ResponseStructure<String>>(responseStructure,HttpStatus.OK);	
 	}
+
+
+
+
+
+	@Override
+	public ResponseEntity<?> writeToExcel(MultipartFile file,int programId, LocalDate fromDate, LocalDate toDate) throws IOException {
+		
+		AcademicPrograms program = academicRepo.findById(programId).orElseThrow(()-> new AcademicProgramNotFoundByIdException("The Given ID Is Not Present In The Database"));
+		LocalDateTime from = fromDate.atTime(LocalTime.MIDNIGHT);
+		LocalDateTime to = toDate.atTime(LocalTime.MIDNIGHT).plusDays(1);
+		
+		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		
+			List<ClassHour> clist = classHourRepo.findAllByAcademicProgramAndBeginsAtBetween(program,from,to);
+			
+			XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+			
+			workbook.forEach(sheet ->{
+				int rowNumber = 0;
+				Row header = sheet.createRow(rowNumber);
+				header.createCell(0).setCellValue("Date");
+				header.createCell(1).setCellValue("Begin Time");
+				header.createCell(2).setCellValue("End Time");
+				header.createCell(3).setCellValue("Subject");
+				header.createCell(4).setCellValue("Teacher");
+				header.createCell(5).setCellValue("Room No");
+				
+				for (ClassHour classhour :clist ) {
+					Row row = sheet.createRow(++rowNumber);
+					row.createCell(0).setCellValue(dateFormatter.format(classhour.getBeginsAt()));
+					row.createCell(1).setCellValue(timeFormatter.format(classhour.getBeginsAt()));
+					row.createCell(2).setCellValue(timeFormatter.format(classhour.getEndsAt()));
+					if(classhour.getSubject() == null) {
+						row.createCell(3).setCellValue("");
+					}else {
+						row.createCell(3).setCellValue(classhour.getSubject().getSubjectName());
+					}
+					if(classhour.getUser() == null) {
+						row.createCell(4).setCellValue("");
+					}else {
+						row.createCell(4).setCellValue(classhour.getUser().getUserName());
+					}
+					if(classhour.getRoomNo() == 0) {
+						row.createCell(5).setCellValue("");
+					}else {
+						row.createCell(5).setCellValue(classhour.getRoomNo());
+					}					
+				}
+				
+			});
+			
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+			workbook.write(outputStream);
+			workbook.close();
+			
+			byte [] byteData = outputStream.toByteArray();
+			
+			return ResponseEntity.ok()
+					.header("Content Disposition", "attachment; filename="+file.getOriginalFilename())
+					.contentType(MediaType.APPLICATION_OCTET_STREAM)
+					.body(byteData);
+			
+
+	}
+
+
+
+	
 
 
 
